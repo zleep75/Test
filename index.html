@@ -165,7 +165,7 @@
             <div style="font-size:16px;color:#7B8281;">个人标签 <span class="req">*</span></div>
             <div style="width:30px;height:30px;border-radius:50%;background:#33CCBF;color:#fff;display:flex;align-items:center;justify-content:center;font-size:19px;font-weight:300;">+</div>
           </div>
-          <div style="font-size:12.5px;color:#33CCBF;margin-bottom:14px;display:flex;align-items:flex-start;gap:5px;line-height:1.5;"><span style="font-size:13px;">✦</span>根据你的个人资料，AI为你推荐了这些标签～</div>
+          <div style="font-size:12.5px;color:#33CCBF;margin-bottom:14px;display:flex;align-items:flex-start;gap:5px;line-height:1.5;"><span style="font-size:13px;">✦</span>AI 只看了你填的职业和国籍，先选这 2 个；其余是你自己点的</div>
           <div style="display:flex;flex-wrap:wrap;gap:12px;align-items:flex-start;">
             <div style="display:flex;flex-direction:column;gap:5px;align-items:flex-start;">
               <div class="tag sel" onclick="this.classList.toggle('sel')"><span class="mk">✦</span>文艺范</div>
@@ -273,8 +273,8 @@
 
         <div style="background:#fff;margin:0 16px;border-radius:18px;border:1px solid #ECEFEF;overflow:hidden;">
           <div style="display:flex;border-bottom:1px solid #F0F2F2;">
-            <div class="lang-tab" data-lang="en" onclick="setLang('en')">English</div>
             <div class="lang-tab" data-lang="zh" onclick="setLang('zh')">中文</div>
+            <div class="lang-tab" data-lang="en" onclick="setLang('en')">English</div>
           </div>
           <div style="padding:18px 18px 8px;">
             <div id="bioText" class="bio-edit" contenteditable="true"></div>
@@ -376,19 +376,16 @@
     }
   };
   var PET = {
-    zh: function (n) { return ['家里有只叫', { hl: n }, '的小宠物。']; },
-    en: function (n) { return ['I share the place with my ', { hl: n }, '. ']; },
-    nl: function (n) { return ['Ik woon samen met mijn ', { hl: n }, '. ']; }
+    zh: function (n) { return ['家里有只叫', { hl: n }, '的小宝贝。']; },
+    en: function (n) { return ['I share the place with my ', { hl: n }, '. ']; }
   };
   var DISH = {
     zh: function (d) { return ['心情好会自己下厨，最拿手', { hl: d }, '。']; },
-    en: function (d) { return ['When the mood strikes I cook — ', { hl: d }, ' is my specialty. ']; },
-    nl: function (d) { return ['Als ik zin heb kook ik — ', { hl: d }, ' is mijn specialiteit. ']; }
+    en: function (d) { return ['When the mood strikes I cook — ', { hl: d }, ' is my specialty. ']; }
   };
   var CUSTOM = {
     zh: function (c) { return [{ hl: c }, '。']; },
-    en: function (c) { return [{ hl: c }, '. ']; },
-    nl: function (c) { return [{ hl: c }, '. ']; }
+    en: function (c) { return [{ hl: c }, '. ']; }
   };
 
   var state = { lang: 'zh', tone: 'sincere', petName: '', dish: '', custom: '', openDetail: null };
