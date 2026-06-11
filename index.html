@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>Wellcee · 资料完善</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { margin: 0; height: 100%; }
+  body { font-family: "Noto Sans SC", -apple-system, "PingFang SC", sans-serif; -webkit-font-smoothing: antialiased; background: #E7EBEB; }
+  @keyframes sparklePulse { 0%,100% { transform: scale(1); opacity: .9; } 50% { transform: scale(1.18); opacity: 1; } }
+
+  .stage { min-height: 100vh; min-height: 100dvh; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+  .device { position: relative; width: 100%; max-width: 393px; height: 100vh; height: 100dvh; background: #F4F6F6; overflow: hidden; }
+  .screen { height: 100%; overflow-y: auto; -webkit-overflow-scrolling: touch; background: #F4F6F6; }
+  .notch { display: none; }
+  @media (min-width: 460px) {
+    .device { width: 417px; height: 876px; max-width: none; border-radius: 56px; border: 12px solid #1d2222; box-shadow: 0 30px 70px rgba(20,40,38,.28); transform: scale(var(--k, 1)); transform-origin: center center; }
+    .notch { display: block; position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 150px; height: 32px; background: #1d2222; border-radius: 0 0 18px 18px; z-index: 30; }
+  }
+
+  section { display: none; }
+  .statusbar { display: flex; align-items: center; justify-content: space-between; padding: 14px 26px 6px; background: #fff; }
+  .statusbar .t { font-size: 15px; font-weight: 600; color: #1a1a1a; }
+  .sig { display: flex; align-items: flex-end; gap: 2px; height: 12px; }
+  .sig div { width: 3px; background: #1a1a1a; border-radius: 1px; }
+  .batt { width: 15px; height: 11px; border: 1.5px solid #1a1a1a; border-radius: 3px; position: relative; }
+  .batt div { position: absolute; inset: 1.5px; background: #1a1a1a; border-radius: 1px; }
+  .apphead { display: flex; align-items: center; padding: 8px 20px 14px; background: #fff; }
+  .apphead .back { font-size: 24px; color: #3A4140; width: 46px; cursor: pointer; }
+  .apphead .ttl { flex: 1; text-align: center; font-size: 18px; font-weight: 600; color: #222827; }
+
+  .cta { background: #33CCBF; color: #fff; border-radius: 30px; font-weight: 600; box-shadow: 0 10px 22px rgba(51,204,191,.34); cursor: pointer; }
+  .homebar { display: flex; justify-content: center; padding: 8px 0 14px; }
+  .homebar div { width: 130px; height: 5px; border-radius: 3px; background: #C9CFCE; }
+
+  .req { color: #33CCBF; }
+  .field { width: 100%; border: none; outline: none; background: transparent; font-family: inherit; font-size: 18px; color: #2B2F2F; padding: 0; }
+  .field::placeholder { color: #C4C9C8; }
+  .gender { padding: 8px 26px; border-radius: 12px; border: 1.5px solid #E2E6E5; color: #9AA0A0; font-size: 15px; cursor: pointer; user-select: none; }
+  .gender.sel { border-color: #33CCBF; background: #EAFAF8; color: #1FA89B; font-weight: 600; }
+  .tag { padding: 9px 18px; border-radius: 18px; background: #EFF2F2; color: #5B6160; font-size: 15px; font-weight: 500; cursor: pointer; user-select: none; }
+  .tag.sel { background: #33CCBF; color: #fff; }
+  .tag.sm { padding: 8px 15px; border-radius: 17px; font-size: 14px; }
+  .tag .mk { font-size: 12px; opacity: .85; margin-right: 3px; }
+
+  .bio-edit { font-size: 16px; line-height: 1.7; color: #2B2F2F; outline: none; border-radius: 8px; padding: 2px 0; }
+  .hl { background: #EAFAF8; color: #1FA89B; border-radius: 4px; padding: 0 3px; font-weight: 600; }
+  .lang-tab { flex: 1; text-align: center; padding: 12px 0; font-size: 14.5px; cursor: pointer; color: #9AA0A0; font-weight: 500; border-bottom: 2px solid transparent; }
+  .lang-tab.active { color: #1FA89B; font-weight: 700; border-bottom: 2px solid #33CCBF; background: #F2FCFB; }
+  .tone { padding: 8px 18px; border-radius: 16px; font-size: 14px; font-weight: 500; cursor: pointer; background: #EFF2F2; color: #5B6160; }
+  .tone.active { background: #33CCBF; color: #fff; }
+  .chip { display: inline-flex; align-items: center; gap: 5px; min-height: 44px; padding: 8px 15px; border-radius: 17px; border: 1.5px dashed #C2D9D6; background: #fff; color: #6A9A95; font-size: 14px; cursor: pointer; }
+  .chip.filled { border-style: solid; border-color: #9FE3DA; background: #F2FCFB; color: #1FA89B; font-weight: 600; }
+  .detail-row { flex-basis: 100%; display: none; align-items: center; gap: 8px; width: 100%; background: #F7FAFA; border-radius: 14px; padding: 8px 12px; }
+  .detail-row .lab { font-size: 14.5px; color: #5B6160; white-space: nowrap; }
+  .detail-row input { flex: 1; min-width: 0; min-height: 40px; border: none; background: transparent; border-bottom: 1.5px solid #CFD6D5; font-size: 14.5px; color: #1FA89B; font-weight: 600; outline: none; padding: 3px 4px; font-family: inherit; }
+  .detail-row .ok { flex: none; width: 40px; height: 40px; border-radius: 12px; background: #33CCBF; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 18px; cursor: pointer; }
+
+  .toast { position: absolute; left: 50%; bottom: 70px; transform: translate(-50%, 16px); background: #222827; color: #fff; font-size: 14px; padding: 11px 22px; border-radius: 24px; opacity: 0; pointer-events: none; transition: opacity .25s, transform .25s; z-index: 40; }
+  .toast.show { opacity: 1; transform: translate(-50%, 0); }
+</style>
+</head>
+<body>
+<div class="stage">
+  <div class="device">
+    <div class="notch"></div>
+    <div class="screen" id="screen">
+
+      <!-- ===================== 屏 1 · 编辑资料 基础 ===================== -->
+      <section id="s1">
+        <div class="statusbar">
+          <div class="t">16:36</div>
+          <div style="display:flex;align-items:center;gap:6px;">
+            <div class="sig"><div style="height:5px"></div><div style="height:8px"></div><div style="height:11px"></div></div>
+            <div class="batt"><div style="width:60%"></div></div>
+          </div>
+        </div>
+        <div class="apphead">
+          <div class="back" style="visibility:hidden;">&lsaquo;</div>
+          <div class="ttl">编辑资料</div>
+          <div style="width:46px;"></div>
+        </div>
+        <div style="background:#E4F7F4;text-align:center;padding:11px;font-size:14px;color:#1FA89B;">长按图片可调整顺序</div>
+
+        <div style="background:#fff;padding:20px;display:flex;gap:14px;">
+          <div style="position:relative;width:128px;height:154px;border-radius:14px;overflow:hidden;background:repeating-linear-gradient(135deg,#EBEEEE,#EBEEEE 9px,#F4F6F6 9px,#F4F6F6 18px);display:flex;align-items:center;justify-content:center;">
+            <div style="font-family:monospace;font-size:12px;color:#A6ADAC;">生活照</div>
+            <div style="position:absolute;top:0;left:0;background:#33CCBF;color:#fff;font-size:11px;padding:3px 12px 4px;border-bottom-right-radius:10px;">封面</div>
+          </div>
+          <div style="width:128px;height:154px;border-radius:14px;border:2px dashed #D2D8D7;display:flex;align-items:center;justify-content:center;color:#BFC6C5;font-size:40px;font-weight:200;">+</div>
+        </div>
+
+        <div style="background:#fff;padding:4px 20px 18px;">
+          <div style="padding:14px 0;border-bottom:1px solid #F0F2F2;">
+            <div style="font-size:14px;color:#9AA0A0;margin-bottom:7px;">昵称 <span class="req">*</span></div>
+            <input class="field" value="Sanne" aria-label="昵称">
+          </div>
+          <div style="padding:14px 0;border-bottom:1px solid #F0F2F2;display:flex;align-items:center;">
+            <div style="font-size:14px;color:#9AA0A0;flex:1;">性别 <span class="req">*</span></div>
+            <div style="display:flex;gap:12px;">
+              <div class="gender" onclick="pickGender(this)">男</div>
+              <div class="gender sel" onclick="pickGender(this)">女</div>
+            </div>
+          </div>
+          <div style="padding:14px 0;border-bottom:1px solid #F0F2F2;">
+            <div style="font-size:14px;color:#9AA0A0;margin-bottom:7px;">专业 / 职业 <span class="req">*</span></div>
+            <input class="field" value="UX 设计师" aria-label="专业或职业">
+          </div>
+          <div style="padding:14px 0;">
+            <div style="font-size:14px;color:#9AA0A0;margin-bottom:7px;">来自 <span class="req">*</span></div>
+            <input class="field" value="荷兰 · 现居上海" aria-label="来自">
+          </div>
+        </div>
+
+        <div style="padding:18px 20px 22px;background:#fff;">
+          <div style="font-size:14px;color:#9AA0A0;margin-bottom:10px;">个人简介 <span class="req">*</span></div>
+          <div style="border:1.5px solid #E2E6E5;border-radius:16px;background:#fff;padding:15px 16px;">
+            <textarea rows="3" placeholder="想写就直接写几句——你是谁、周末爱干嘛、想找什么样的室友都行。" style="width:100%;border:none;outline:none;resize:none;font-family:inherit;font-size:15px;line-height:1.65;color:#2B2F2F;background:transparent;"></textarea>
+          </div>
+          <div style="margin-top:10px;font-size:12.5px;color:#9AA0A0;line-height:1.55;display:flex;gap:6px;align-items:flex-start;"><span style="color:#33CCBF;flex:none;">✦</span><span>暂时没思路也没关系——空着就行。下一步选完标签后，AI 会照你的资料帮你写一版，之后随时能改。</span></div>
+        </div>
+
+        <div style="padding:6px 20px 22px;display:flex;justify-content:flex-end;background:#fff;">
+          <div class="cta" style="padding:15px 44px;font-size:17px;" onclick="go(2)">下一步</div>
+        </div>
+        <div class="homebar"><div></div></div>
+      </section>
+
+      <!-- ===================== 屏 2 · 标签 · 兴趣 ===================== -->
+      <section id="s2">
+        <div class="statusbar">
+          <div class="t">16:37</div>
+          <div style="display:flex;align-items:center;gap:6px;">
+            <div class="sig"><div style="height:5px"></div><div style="height:8px"></div><div style="height:11px"></div></div>
+            <div class="batt"><div style="width:55%"></div></div>
+          </div>
+        </div>
+        <div class="apphead">
+          <div class="back" onclick="go(1)">&lsaquo;</div>
+          <div class="ttl">编辑资料</div>
+          <div style="width:46px;text-align:right;font-size:16px;color:#1FA89B;font-weight:600;">保存</div>
+        </div>
+
+        <div style="background:#fff;padding:6px 20px 18px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin:10px 0 14px;">
+            <div style="font-size:16px;color:#7B8281;">语言 <span class="req">*</span></div>
+            <div style="width:30px;height:30px;border-radius:50%;background:#33CCBF;color:#fff;display:flex;align-items:center;justify-content:center;font-size:19px;font-weight:300;">+</div>
+          </div>
+          <div style="display:flex;flex-wrap:wrap;gap:10px;">
+            <div class="tag sel" onclick="this.classList.toggle('sel')">英文</div>
+            <div class="tag sel" onclick="this.classList.toggle('sel')">中文</div>
+            <div class="tag sel" onclick="this.classList.toggle('sel')">荷兰语</div>
+            <div class="tag" onclick="this.classList.toggle('sel')">日语</div>
+            <div class="tag" onclick="this.classList.toggle('sel')">法文</div>
+            <div class="tag" onclick="this.classList.toggle('sel')">西语</div>
+          </div>
+        </div>
+
+        <div style="background:#fff;padding:6px 20px 20px;margin-top:10px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin:10px 0 4px;">
+            <div style="font-size:16px;color:#7B8281;">个人标签 <span class="req">*</span></div>
+            <div style="width:30px;height:30px;border-radius:50%;background:#33CCBF;color:#fff;display:flex;align-items:center;justify-content:center;font-size:19px;font-weight:300;">+</div>
+          </div>
+          <div style="font-size:12.5px;color:#33CCBF;margin-bottom:14px;display:flex;align-items:flex-start;gap:5px;line-height:1.5;"><span style="font-size:13px;">✦</span>根据你的个人资料，AI为你推荐了这些标签～</div>
+          <div style="display:flex;flex-wrap:wrap;gap:12px;align-items:flex-start;">
+            <div style="display:flex;flex-direction:column;gap:5px;align-items:flex-start;">
+              <div class="tag sel" onclick="this.classList.toggle('sel')"><span class="mk">✦</span>文艺范</div>
+              <div style="font-size:11.5px;color:#1FA89B;padding-left:4px;">AI · UX 设计师</div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:5px;align-items:flex-start;">
+              <div class="tag sel" onclick="this.classList.toggle('sel')"><span class="mk">✦</span>歪果仁</div>
+              <div style="font-size:11.5px;color:#1FA89B;padding-left:4px;">AI · 荷兰来的</div>
+            </div>
+            <div class="tag sel" style="align-self:flex-start;" onclick="this.classList.toggle('sel')">铲屎官</div>
+            <div class="tag sel" style="align-self:flex-start;" onclick="this.classList.toggle('sel')">觅食家</div>
+            <div class="tag" style="align-self:flex-start;" onclick="this.classList.toggle('sel')">学生</div>
+            <div class="tag" style="align-self:flex-start;" onclick="this.classList.toggle('sel')">不务正业</div>
+            <div class="tag" style="align-self:flex-start;" onclick="this.classList.toggle('sel')">土著</div>
+            <div class="tag" style="align-self:flex-start;" onclick="this.classList.toggle('sel')">小白</div>
+          </div>
+        </div>
+
+        <div style="background:#fff;padding:16px 20px 20px;margin-top:10px;">
+          <div style="font-size:16px;color:#7B8281;margin-bottom:14px;">更多</div>
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">
+            <div style="font-size:21px;width:26px;text-align:center;">🏀</div>
+            <div style="display:flex;flex-wrap:wrap;gap:9px;flex:1;">
+              <div class="tag sm sel" onclick="this.classList.toggle('sel')">篮球</div>
+              <div class="tag sm" onclick="this.classList.toggle('sel')">足球</div>
+              <div class="tag sm" onclick="this.classList.toggle('sel')">跑步</div>
+              <div class="tag sm" onclick="this.classList.toggle('sel')">网球</div>
+            </div>
+            <div style="width:26px;height:26px;border-radius:50%;background:#33CCBF;color:#fff;display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:300;flex:none;">+</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">
+            <div style="font-size:21px;width:26px;text-align:center;">🍣</div>
+            <div style="display:flex;flex-wrap:wrap;gap:9px;flex:1;">
+              <div class="tag sm sel" onclick="this.classList.toggle('sel')">寿司</div>
+              <div class="tag sm" onclick="this.classList.toggle('sel')">牛排</div>
+              <div class="tag sm" onclick="this.classList.toggle('sel')">火锅</div>
+              <div class="tag sm" onclick="this.classList.toggle('sel')">咖啡</div>
+            </div>
+            <div style="width:26px;height:26px;border-radius:50%;background:#33CCBF;color:#fff;display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:300;flex:none;">+</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">
+            <div style="font-size:21px;width:26px;text-align:center;">📖</div>
+            <div style="display:flex;flex-wrap:wrap;gap:9px;flex:1;">
+              <div class="tag sm sel" onclick="this.classList.toggle('sel')">小说</div>
+              <div class="tag sm" onclick="this.classList.toggle('sel')">杂志</div>
+              <div class="tag sm" onclick="this.classList.toggle('sel')">哲学</div>
+              <div class="tag sm" onclick="this.classList.toggle('sel')">历史</div>
+            </div>
+            <div style="width:26px;height:26px;border-radius:50%;background:#33CCBF;color:#fff;display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:300;flex:none;">+</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:12px;">
+            <div style="font-size:21px;width:26px;text-align:center;">🌏</div>
+            <div style="display:flex;flex-wrap:wrap;gap:9px;flex:1;">
+              <div class="tag sm sel" onclick="this.classList.toggle('sel')">日本</div>
+              <div class="tag sm sel" onclick="this.classList.toggle('sel')">法国</div>
+              <div class="tag sm" onclick="this.classList.toggle('sel')">泰国</div>
+              <div class="tag sm" onclick="this.classList.toggle('sel')">美国</div>
+            </div>
+            <div style="width:26px;height:26px;border-radius:50%;background:#33CCBF;color:#fff;display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:300;flex:none;">+</div>
+          </div>
+        </div>
+
+        <div style="background:#fff;padding:16px 20px 22px;margin-top:10px;">
+          <div style="font-size:16px;color:#7B8281;margin-bottom:14px;">与 TA 分享</div>
+          <div style="display:flex;align-items:center;gap:12px;">
+            <div style="font-size:21px;width:26px;text-align:center;">🙂</div>
+            <div style="display:flex;flex-wrap:wrap;gap:9px;flex:1;">
+              <div class="tag sm sel" onclick="this.classList.toggle('sel')">厨艺</div>
+              <div class="tag sm sel" onclick="this.classList.toggle('sel')">照顾宠物</div>
+              <div class="tag sm" onclick="this.classList.toggle('sel')">旅行</div>
+              <div class="tag sm" onclick="this.classList.toggle('sel')">音乐</div>
+            </div>
+            <div style="width:26px;height:26px;border-radius:50%;background:#33CCBF;color:#fff;display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:300;flex:none;">+</div>
+          </div>
+        </div>
+
+        <div style="padding:14px 20px 22px;display:flex;justify-content:flex-end;background:#fff;">
+          <div class="cta" style="padding:15px 44px;font-size:17px;" onclick="go(3)">下一步</div>
+        </div>
+        <div class="homebar"><div></div></div>
+      </section>
+
+      <!-- ===================== 屏 3 · 你的资料 预览 ===================== -->
+      <section id="s3">
+        <div class="statusbar">
+          <div class="t">16:38</div>
+          <div style="display:flex;align-items:center;gap:6px;">
+            <div class="sig"><div style="height:5px"></div><div style="height:8px"></div><div style="height:11px"></div></div>
+            <div class="batt"><div style="width:50%"></div></div>
+          </div>
+        </div>
+        <div class="apphead">
+          <div class="back" onclick="go(2)">&lsaquo;</div>
+          <div class="ttl">你的资料</div>
+          <div style="width:46px;"></div>
+        </div>
+
+        <div style="background:#fff;padding:4px 20px 18px;display:flex;gap:11px;align-items:flex-start;">
+          <div style="width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#3CD8C8,#19B6A6);display:flex;align-items:center;justify-content:center;color:#fff;font-size:16px;flex:none;animation:sparklePulse 2.4s ease-in-out infinite;">✦</div>
+          <div>
+            <div style="font-size:16px;color:#222827;font-weight:600;line-height:1.4;">这个个人简介怎么样？</div>
+            <div style="font-size:13px;color:#9AA0A0;margin-top:2px;">我照你的标签写好了——把不像你的地方改掉就行。</div>
+          </div>
+        </div>
+
+        <div style="background:#fff;margin:0 16px;border-radius:18px;border:1px solid #ECEFEF;overflow:hidden;">
+          <div style="display:flex;border-bottom:1px solid #F0F2F2;">
+            <div class="lang-tab" data-lang="en" onclick="setLang('en')">English</div>
+            <div class="lang-tab" data-lang="zh" onclick="setLang('zh')">中文</div>
+            <div class="lang-tab" data-lang="nl" onclick="setLang('nl')">Nederlands</div>
+          </div>
+          <div style="padding:18px 18px 8px;">
+            <div id="bioText" class="bio-edit" contenteditable="true"></div>
+            <div style="display:flex;align-items:center;gap:6px;margin-top:10px;font-size:12px;color:#BFC6C5;"><span>✎</span> 点上方文字即可就地修改</div>
+          </div>
+          <div style="padding:6px 18px 18px;">
+            <div style="font-size:13px;color:#9AA0A0;margin-bottom:10px;">换个语气</div>
+            <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+              <div class="tone" data-tone="sincere" onclick="setTone('sincere')">真诚</div>
+              <div class="tone" data-tone="playful" onclick="setTone('playful')">俏皮</div>
+              <div class="tone" data-tone="concise" onclick="setTone('concise')">简洁</div>
+              <div style="margin-left:auto;display:inline-flex;align-items:center;gap:5px;padding:8px 14px;border-radius:16px;border:1.5px solid #D7DCDB;color:#6A7170;font-size:13.5px;font-weight:500;cursor:pointer;" onclick="rewrite()">↻ 换个说法</div>
+            </div>
+          </div>
+        </div>
+
+        <div style="background:#fff;margin:14px 16px 0;border-radius:18px;border:1px solid #ECEFEF;padding:16px 18px;">
+          <div style="font-size:14px;color:#444C4B;font-weight:600;margin-bottom:13px;">加个小细节，简介更像你</div>
+          <div style="display:flex;flex-wrap:wrap;gap:9px;">
+            <div class="chip" id="chip-pet" onclick="toggleDetail('pet')">＋ 我的宠物叫…</div>
+            <div class="detail-row" id="row-pet">
+              <span class="lab">我的宠物叫</span>
+              <input id="in-pet" placeholder="它的名字" oninput="onDetail('pet', this.value)">
+              <div class="ok" onclick="closeDetail()">✓</div>
+            </div>
+            <div class="chip" id="chip-dish" onclick="toggleDetail('dish')">＋ 我的拿手菜是…</div>
+            <div class="detail-row" id="row-dish">
+              <span class="lab">我的拿手菜是</span>
+              <input id="in-dish" placeholder="一道菜" oninput="onDetail('dish', this.value)">
+              <div class="ok" onclick="closeDetail()">✓</div>
+            </div>
+            <div class="chip" id="chip-custom" onclick="toggleDetail('custom')">＋ 自己加一个</div>
+            <div class="detail-row" id="row-custom">
+              <span class="lab">我还想说</span>
+              <input id="in-custom" placeholder="随便写一句" oninput="onDetail('custom', this.value)">
+              <div class="ok" onclick="closeDetail()">✓</div>
+            </div>
+          </div>
+        </div>
+
+        <div style="margin:18px 16px 0;">
+          <div style="font-size:13px;color:#9AA0A0;margin:0 4px 10px;">别人看到的你</div>
+          <div style="background:#fff;border-radius:20px;box-shadow:0 6px 20px rgba(30,50,48,.07);overflow:hidden;">
+            <div style="height:96px;background:repeating-linear-gradient(135deg,#E5F6F3,#E5F6F3 10px,#EDF8F6 10px,#EDF8F6 20px);"></div>
+            <div style="padding:0 18px 18px;margin-top:-44px;">
+              <div style="width:80px;height:80px;border-radius:50%;border:4px solid #fff;background:repeating-linear-gradient(135deg,#E0E4E4,#E0E4E4 7px,#EFF1F1 7px,#EFF1F1 14px);display:flex;align-items:center;justify-content:center;font-family:monospace;font-size:11px;color:#A6ADAC;">头像</div>
+              <div style="display:flex;align-items:baseline;gap:9px;margin-top:10px;">
+                <div style="font-size:21px;font-weight:700;color:#222827;">Sanne</div>
+                <div style="font-size:14px;color:#8A9290;">24 · 上海 · UX 设计师</div>
+              </div>
+              <div style="display:flex;gap:7px;margin-top:10px;flex-wrap:wrap;">
+                <div style="padding:4px 11px;border-radius:13px;background:#EAFAF8;color:#1FA89B;font-size:12.5px;font-weight:500;">🇬🇧 EN</div>
+                <div style="padding:4px 11px;border-radius:13px;background:#EAFAF8;color:#1FA89B;font-size:12.5px;font-weight:500;">🇨🇳 中文</div>
+                <div style="padding:4px 11px;border-radius:13px;background:#EAFAF8;color:#1FA89B;font-size:12.5px;font-weight:500;">🇳🇱 NL</div>
+              </div>
+              <div id="previewBio" style="font-size:14px;color:#4A514F;line-height:1.6;margin-top:12px;"></div>
+              <div style="display:flex;gap:7px;margin-top:13px;flex-wrap:wrap;">
+                <div style="padding:5px 13px;border-radius:15px;background:#F2F4F4;color:#5B6160;font-size:13px;">铲屎官</div>
+                <div style="padding:5px 13px;border-radius:15px;background:#F2F4F4;color:#5B6160;font-size:13px;">文艺范</div>
+                <div style="padding:5px 13px;border-radius:15px;background:#F2F4F4;color:#5B6160;font-size:13px;">歪果仁</div>
+                <div style="padding:5px 13px;border-radius:15px;background:#F2F4F4;color:#5B6160;font-size:13px;">觅食家</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div style="margin:16px 16px 0;background:#F2FCFB;border:1px solid #CFEFEB;border-radius:18px;padding:16px 18px;display:flex;align-items:center;gap:15px;">
+          <div style="width:58px;height:58px;border-radius:50%;background:conic-gradient(#33CCBF 0% 92%,#DCEEEC 92% 100%);display:flex;align-items:center;justify-content:center;flex:none;">
+            <div style="width:44px;height:44px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;color:#1FA89B;">92%</div>
+          </div>
+          <div>
+            <div style="font-size:15px;color:#222827;font-weight:600;">就差一项啦</div>
+            <div style="font-size:13px;color:#6A8F8B;margin-top:3px;line-height:1.4;">再加一张生活照，资料就齐了 ✨</div>
+          </div>
+        </div>
+
+        <div style="padding:18px 16px 20px;">
+          <div class="cta" style="padding:16px 0;font-size:17px;text-align:center;" onclick="publish()">完成并发布</div>
+        </div>
+        <div class="homebar"><div></div></div>
+      </section>
+
+    </div>
+    <div class="toast" id="toast">资料已发布</div>
+  </div>
+</div>
+
+<script>
+  var BIOS = {
+    zh: {
+      sincere: { role: '荷兰来的 UX 设计师，', weekend: '周末基本在逛马路、泡咖啡馆，最近很喜欢寿司。', seek: '想找个作息合拍、也喜欢小动物的室友。' },
+      playful: { role: '荷兰来的设计师一枚，', weekend: '周末不是在咖啡馆，就是在去吃寿司的路上。', seek: '求一个作息差不多、不嫌家里热闹的室友～' },
+      concise: { role: '荷兰 UX 设计师。', weekend: '爱咖啡和寿司。', seek: '想找作息合拍、喜欢小动物的室友。' }
+    },
+    en: {
+      sincere: { role: 'A Dutch UX designer living in Shanghai. ', weekend: "Most weekends I'm wandering the streets or parked in a coffee shop, and I've been a little obsessed with sushi lately. ", seek: 'Hoping to find a roommate who keeps similar hours and likes animals.' },
+      playful: { role: 'Dutch designer here, in Shanghai. ', weekend: "You'll find me in a coffee shop or on my way to sushi most weekends. ", seek: "Looking for a roommate who keeps roughly the same hours and doesn't mind a furry friend around." },
+      concise: { role: 'Dutch UX designer. ', weekend: 'Big on coffee and sushi. ', seek: 'Looking for a roommate on a similar schedule who likes animals.' }
+    },
+    nl: {
+      sincere: { role: 'Nederlandse UX-designer in Shanghai. ', weekend: 'In het weekend struin ik door de stad of zit ik in een koffiebar, en de laatste tijd ben ik helemaal weg van sushi. ', seek: 'Ik zoek een huisgenoot met hetzelfde ritme die van dieren houdt.' },
+      playful: { role: 'Nederlandse designer hier, in Shanghai. ', weekend: 'In het weekend vind je me in een koffiebar of onderweg naar de sushi. ', seek: 'Zoek een huisgenoot met ongeveer hetzelfde ritme die niet om een huisdier geeft.' },
+      concise: { role: 'Nederlandse UX-designer. ', weekend: 'Gek op koffie en sushi. ', seek: 'Op zoek naar een huisgenoot met hetzelfde ritme die van dieren houdt.' }
+    }
+  };
+  var PET = {
+    zh: function (n) { return ['家里有只叫', { hl: n }, '的小宝贝。']; },
+    en: function (n) { return ['I share the place with my ', { hl: n }, '. ']; },
+    nl: function (n) { return ['Ik woon samen met mijn ', { hl: n }, '. ']; }
+  };
+  var DISH = {
+    zh: function (d) { return ['心情好会自己下厨，最拿手', { hl: d }, '。']; },
+    en: function (d) { return ['When the mood strikes I cook — ', { hl: d }, ' is my specialty. ']; },
+    nl: function (d) { return ['Als ik zin heb kook ik — ', { hl: d }, ' is mijn specialiteit. ']; }
+  };
+  var CUSTOM = {
+    zh: function (c) { return [{ hl: c }, '。']; },
+    en: function (c) { return [{ hl: c }, '. ']; },
+    nl: function (c) { return [{ hl: c }, '. ']; }
+  };
+
+  var state = { lang: 'zh', tone: 'sincere', petName: '', dish: '', custom: '', openDetail: null };
+  var KEYMAP = { pet: 'petName', dish: 'dish', custom: 'custom' };
+
+  function esc(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+
+  function buildSegments() {
+    var b = BIOS[state.lang][state.tone];
+    var p = state.petName.trim(), d = state.dish.trim(), c = state.custom.trim();
+    var segs = [b.role];
+    if (p) segs = segs.concat(PET[state.lang](p));
+    segs.push(b.weekend);
+    if (d) segs = segs.concat(DISH[state.lang](d));
+    if (c) segs = segs.concat(CUSTOM[state.lang](c));
+    segs.push(b.seek);
+    return segs;
+  }
+
+  function renderBio() {
+    var segs = buildSegments();
+    var html = segs.map(function (s) {
+      return typeof s === 'string' ? esc(s) : '<span class="hl">' + esc(s.hl) + '</span>';
+    }).join('');
+    var plain = segs.map(function (s) { return typeof s === 'string' ? s : s.hl; }).join('');
+    document.getElementById('bioText').innerHTML = html;
+    document.getElementById('previewBio').textContent = plain;
+  }
+
+  function setLang(l) {
+    state.lang = l;
+    var tabs = document.querySelectorAll('.lang-tab');
+    for (var i = 0; i < tabs.length; i++) tabs[i].classList.toggle('active', tabs[i].dataset.lang === l);
+    renderBio();
+  }
+  function setTone(t) {
+    state.tone = t;
+    var cs = document.querySelectorAll('.tone');
+    for (var i = 0; i < cs.length; i++) cs[i].classList.toggle('active', cs[i].dataset.tone === t);
+    renderBio();
+  }
+  function rewrite() {
+    var order = ['sincere', 'playful', 'concise'];
+    setTone(order[(order.indexOf(state.tone) + 1) % 3]);
+  }
+
+  function refreshChip(key) {
+    var el = document.getElementById('chip-' + key);
+    var val = state[KEYMAP[key]].trim();
+    if (key === 'pet') el.textContent = val ? ('✓ 我的宠物叫 ' + val) : '＋ 我的宠物叫…';
+    else if (key === 'dish') el.textContent = val ? ('✓ 我的拿手菜是 ' + val) : '＋ 我的拿手菜是…';
+    else el.textContent = val ? ('✓ ' + val) : '＋ 自己加一个';
+    el.classList.toggle('filled', !!val);
+  }
+  function refreshRows() {
+    ['pet', 'dish', 'custom'].forEach(function (k) {
+      document.getElementById('row-' + k).style.display = (state.openDetail === k ? 'flex' : 'none');
+    });
+  }
+  function toggleDetail(key) {
+    state.openDetail = (state.openDetail === key ? null : key);
+    refreshRows();
+    if (state.openDetail === key) {
+      var input = document.getElementById('in-' + key);
+      setTimeout(function () { if (input) input.focus(); }, 0);
+    }
+  }
+  function closeDetail() { state.openDetail = null; refreshRows(); }
+  function onDetail(key, val) { state[KEYMAP[key]] = val; refreshChip(key); renderBio(); }
+
+  function pickGender(el) {
+    var sibs = el.parentNode.children;
+    for (var i = 0; i < sibs.length; i++) sibs[i].classList.remove('sel');
+    el.classList.add('sel');
+  }
+
+  function go(n) {
+    ['s1', 's2', 's3'].forEach(function (id, i) {
+      document.getElementById(id).style.display = (i === n - 1 ? 'block' : 'none');
+    });
+    var sc = document.getElementById('screen');
+    if (sc) sc.scrollTop = 0;
+  }
+
+  var toastTimer = null;
+  function publish() {
+    var t = document.getElementById('toast');
+    t.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () { t.classList.remove('show'); }, 1800);
+  }
+
+  function fitDevice() {
+    var dev = document.querySelector('.device');
+    if (!dev) return;
+    if (window.matchMedia('(min-width: 460px)').matches) {
+      var outerW = 417, outerH = 876, margin = 40;
+      var k = Math.min(1, (window.innerHeight - margin) / outerH, (window.innerWidth - margin) / outerW);
+      dev.style.setProperty('--k', k);
+    } else {
+      dev.style.removeProperty('--k');
+    }
+  }
+  window.addEventListener('resize', fitDevice);
+
+  setLang('zh'); setTone('sincere');
+  refreshChip('pet'); refreshChip('dish'); refreshChip('custom');
+  refreshRows(); renderBio(); go(1);
+  fitDevice();
+</script>
+</body>
+</html>

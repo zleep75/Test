@@ -1,0 +1,12 @@
+{
+  "name": "wellcee-profile-prototype",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Wellcee 个人资料完善流程改版 · 交互原型(静态,无后端、无 AI API)",
+  "scripts": {
+    "start": "serve -s . -l $PORT"
+  },
+  "dependencies": {
+    "serve": "^14.2.1"
+  }
+}
