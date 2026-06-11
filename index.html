@@ -275,7 +275,6 @@
           <div style="display:flex;border-bottom:1px solid #F0F2F2;">
             <div class="lang-tab" data-lang="en" onclick="setLang('en')">English</div>
             <div class="lang-tab" data-lang="zh" onclick="setLang('zh')">中文</div>
-            <div class="lang-tab" data-lang="nl" onclick="setLang('nl')">Nederlands</div>
           </div>
           <div style="padding:18px 18px 8px;">
             <div id="bioText" class="bio-edit" contenteditable="true"></div>
@@ -374,15 +373,10 @@
       sincere: { role: 'A Dutch UX designer living in Shanghai. ', weekend: "Most weekends I'm wandering the streets or parked in a coffee shop, and I've been a little obsessed with sushi lately. ", seek: 'Hoping to find a roommate who keeps similar hours and likes animals.' },
       playful: { role: 'Dutch designer here, in Shanghai. ', weekend: "You'll find me in a coffee shop or on my way to sushi most weekends. ", seek: "Looking for a roommate who keeps roughly the same hours and doesn't mind a furry friend around." },
       concise: { role: 'Dutch UX designer. ', weekend: 'Big on coffee and sushi. ', seek: 'Looking for a roommate on a similar schedule who likes animals.' }
-    },
-    nl: {
-      sincere: { role: 'Nederlandse UX-designer in Shanghai. ', weekend: 'In het weekend struin ik door de stad of zit ik in een koffiebar, en de laatste tijd ben ik helemaal weg van sushi. ', seek: 'Ik zoek een huisgenoot met hetzelfde ritme die van dieren houdt.' },
-      playful: { role: 'Nederlandse designer hier, in Shanghai. ', weekend: 'In het weekend vind je me in een koffiebar of onderweg naar de sushi. ', seek: 'Zoek een huisgenoot met ongeveer hetzelfde ritme die niet om een huisdier geeft.' },
-      concise: { role: 'Nederlandse UX-designer. ', weekend: 'Gek op koffie en sushi. ', seek: 'Op zoek naar een huisgenoot met hetzelfde ritme die van dieren houdt.' }
     }
   };
   var PET = {
-    zh: function (n) { return ['家里有只叫', { hl: n }, '的小宝贝。']; },
+    zh: function (n) { return ['家里有只叫', { hl: n }, '的小宠物。']; },
     en: function (n) { return ['I share the place with my ', { hl: n }, '. ']; },
     nl: function (n) { return ['Ik woon samen met mijn ', { hl: n }, '. ']; }
   };
